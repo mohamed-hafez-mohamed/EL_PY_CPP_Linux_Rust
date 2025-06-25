@@ -3,6 +3,7 @@
 
 def vowel(letter):
     """Write your solution here. Don't forget to return the result at the end."""
+    print(letter)
 
 
 if __name__ == "__main__":
