@@ -3,11 +3,11 @@
 
 def compute(number):
     """write your soulution Here Sum 1 … n — Compute and display the running total."""
-    sum=0
-    while number > 0 :
-      sum +=number
-      number= number -1   
-    return sum
+    total = 0
+    while number > 0:
+        total += number
+        number -= 1
+    return total
 
 if __name__ == "__main__":
     assert compute(5) == 15, "Test case failed"
