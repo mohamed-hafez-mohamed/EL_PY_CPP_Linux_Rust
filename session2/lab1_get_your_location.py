@@ -14,6 +14,7 @@ def get_info_location():
     my_location_dic = location_reponse.json()
     return my_location_dic
 
+
 if __name__ == "__main__":
     location_info = get_info_location()
     assert "ip" in location_info, "Test case failed"
