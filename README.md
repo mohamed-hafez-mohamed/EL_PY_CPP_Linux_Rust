@@ -1,6 +1,7 @@
 # El2025Tasks
 this is repo for Embedded Linux Diploma for EL2025
 ## Python
+
 ├── session1
 │   ├── lab1_list_count.py
 │   ├── lab2_vowel_or_not.py
