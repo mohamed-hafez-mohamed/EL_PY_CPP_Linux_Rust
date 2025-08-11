@@ -5,7 +5,7 @@
 bool allEven(int arr[], int size) {
   // Professional C++ solution using std::all_of with lambda
   // using std::all_of
-  return false;
+  return std::all_of(arr, arr + size, [](int array_element){return array_element % 2 == 0;});
 }
 
 int main() {

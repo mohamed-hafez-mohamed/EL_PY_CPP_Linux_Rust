@@ -5,7 +5,7 @@
 bool anyEven(int arr[], int size) {
   // Professional C++ solution using std::any_of with lambda
   // using std::any_of
-  return false;
+  return std::any_of(arr, arr + size,[](int array_element){return array_element % 2 == 0;});
 }
 
 int main() {
