@@ -12,20 +12,26 @@ private:
 public:
   // Default constructor
   // write your solution here...
-  MyString() : string_data{""}, length{0}  {}
+  MyString()
+  {
+    string_data = new char[1];
+    strcpy(string_data,"");
+    length = 0;
+  }
 
   MyString(const char *str)
   {
     if(str != nullptr)
     {
       length = std::strlen(str);
-      string_data = new char[length + 1];
-      std::strcpy(string_data, str);
+      string_data = new char[length + 1];  // +1 for null terminator
+      strcpy(string_data, str);
     }
     else
     {
-      string_data = nullptr;
       length = 0;
+      string_data = new char[1];
+      strcpy(string_data,"");
     }
   }
 
