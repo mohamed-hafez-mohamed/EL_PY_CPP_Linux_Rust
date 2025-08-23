@@ -12,30 +12,69 @@ private:
 public:
   // Default constructor
   // write your solution here...
-  MyString() {}
+  MyString()
+  {
+    string_data = new char[1];
+    strcpy(string_data,"");
+    length = 0;
+  }
 
-  MyString(const char *str) {}
+  MyString(const char *str)
+  {
+    if(str != nullptr)
+    {
+      length = std::strlen(str);
+      string_data = new char[length + 1];  // +1 for null terminator
+      strcpy(string_data, str);
+    }
+    else
+    {
+      length = 0;
+      string_data = new char[1];
+      strcpy(string_data,"");
+    }
+  }
 
   // Destructor
   ~MyString() = default;
 
   // Getters
-  size_t getLength() const { return 0; }
-  const char *getString() const { return ""; }
+  size_t getLength() const { return length; }
+  const char *getString() const { return string_data; }
 
   // Indexing operator (const version)
   // uncomment and write your solution
-  //   const char &operator[](size_t index) const { }
+  const char &operator[](size_t index) const
+  {
+    return string_data[index];
+  }
 
   // Indexing operator (non-const version)
   // uncomment and write your solution
-  //   char &operator[](size_t index) {  }
+  char &operator[](size_t index)
+  {
+    return string_data[index];
+  }
 
   // Equality operator
-  bool operator==(const MyString &other) const { return false; }
+  bool operator==(const MyString &other) const
+  {
+    std::string f_string{this->string_data};
+    std::string s_string{other.string_data};
+    transform(begin(f_string), end(f_string), begin(f_string), ::toupper);
+    transform(begin(s_string), end(s_string), begin(s_string), ::toupper);
+    return f_string == s_string; 
+  }
 
   // Inequality operator
-  bool operator!=(const MyString &other) const { return false; }
+  bool operator!=(const MyString &other) const
+  {
+    std::string f_string{this->string_data};
+    std::string s_string{other.string_data};
+    transform(begin(f_string), end(f_string), begin(f_string), ::toupper);
+    transform(begin(s_string), end(s_string), begin(s_string), ::toupper);
+    return f_string != s_string;
+  }
 };
 
 int main() {
