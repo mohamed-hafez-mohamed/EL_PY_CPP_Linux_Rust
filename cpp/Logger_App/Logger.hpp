@@ -1,12 +1,39 @@
+/**
+ ********************************************************************************
+ * @file    Logger.hpp
+ * @author  MHafez
+ * @date    26 August 2025
+ * @brief   This file headers for the Logger class interfaces
+ ********************************************************************************
+ */
 
+/************************************
+ * INCLUDES
+ ************************************/
 #include <stdint.h>
 #include <string>
 #include <vector>
 #include <fstream>
 #include <mutex>
 
+/************************************
+ * NAMESPACES
+ ************************************/
+
+/**
+ * @namespace App
+ * @brief A collection of various application utilities.
+ */
 namespace App
 {
+    /**
+     * @class   Logger
+     * @brief   A thread-safe logging utility.
+     *
+     * This class provides a logging mechanism that is safe for use in
+     * a multi-threaded environment. It supports logging messages to
+     * both console and file outputs.
+     */
     class Logger
     {
         public:
@@ -21,8 +48,33 @@ namespace App
                 ERROR    = UINT8_C(3),
                 CRITICAL = UINT8_C(4)
             };
+            /**
+             * @brief Constructs a Logger instance.
+             * @param logLevel The logging level.
+             * @param logFileName The name of the log file.
+             * @param writeToConsole Flag indicating whether to write to console.
+             */
             Logger(Levels logLevel, const std::string& logFileName, bool writeToConsole);
+            /**
+             * @brief Destroys the Logger instance.
+             */
             virtual ~Logger();
+            void debug(const std::string& message);
+            void info(const std::string& message);
+            void warning(const std::string& message);
+            void error(const std::string& message);
+            void critical(const std::string& message);
+            void setLogLevel(Levels logLevel);
+            Levels getLogLevel() const;
+            void setWriteToFile(bool enabled, const std::string& fileName = "");
+            void setWriteToConsole(bool enabled);
+            std::vector<std::string> getLogBuffer() const;
+            size_t getBufferSize(void) const;
+            void clearLogBuffer(void);
+            void flushLogBuffer(void);
+            void printBuffer(void);
+            void dumpLogBufferToLogFile(const std::string& fileName = "");
+            void printStatistics(void) const;
         private:
             Levels m_logLevel;
             std::vector<std::string> m_buffer;
@@ -34,6 +86,9 @@ namespace App
             /**
              * @brief helper function to convert enum value to string
              */
-            std::string convertLvlsToString(Levels level);
+            std::string convertLevelToString(Levels level);
+            std::string getCurrentTimestamp(void) const;
+            std::string formatMessage(Levels level, const std::string& message);
+            void logMessage(Levels level, const std::string& message);
     };
 }
