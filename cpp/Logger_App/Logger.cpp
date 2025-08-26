@@ -49,6 +49,81 @@ namespace App
             m_logFileHandle.close();
         }
     }
+    void Logger::setWriteToFile(bool enabled, const std::string& fileName = "")
+    {
+        std::lock_guard<std::mutex> lock(m_logMutex);
+        if(enabled && (!fileName.empty()))
+        {
+            if(m_logFileHandle.is_open())
+            {
+                m_logFileHandle.close();
+            }
+            m_logFileName = fileName;
+            m_logFileHandle.open(m_logFileName, std::ios::app);
+            m_isWriteToFileEnabled = m_logFileHandle.is_open();
+        }
+        else if(enabled && (fileName.empty()))
+        {
+            if(!(m_logFileHandle.is_open()))
+            {
+                m_logFileHandle.open(m_logFileName, std::ios::app);
+                m_isWriteToFileEnabled = m_logFileHandle.is_open();
+            }
+        }
+        else
+        {
+            m_isWriteToFileEnabled = false;
+            if(m_logFileHandle.is_open())
+            {
+                m_logFileHandle.close();
+            }
+        }
+    }
+    
+    void Logger::printBuffer(void)
+    {
+        std::lock_guard<std::mutex> lock(m_logMutex);
+        auto bufferIterator = m_buffer.begin();
+        std::cout << "\n=== LOG BUFFER CONTENTS ===" << std::endl;
+        while(bufferIterator != m_buffer.end())
+        {
+            std::cout << *bufferIterator << std::endl;
+        }
+        std::cout << "=== END LOG BUFFER ===" << std::endl;
+    }
+
+    void Logger::dumpLogBufferToLogFile(const std::string& fileName = "")
+    {
+        std::lock_guard<std::mutex> lock(m_logMutex);
+        std::ofstream fileHandle(fileName);
+        if(fileHandle.is_open())
+        {
+            for(const auto& iterator : m_buffer)
+            {
+                fileHandle << iterator << std::endl;
+            }
+            fileHandle.close();
+            std::cout << "Logs dumped to: " << fileName << std::endl;
+        }
+        {
+            std::cerr << "Failed to open file for dumping: " << fileName << std::endl;
+        }
+    }
+
+    void Logger::printStatistics(void) 
+    {
+        std::lock_guard<std::mutex> lock(m_logMutex);
+        std::cout << "\n=== LOGGER STATISTICS ===" << std::endl;
+        std::cout << "Buffer size: " << m_buffer.size() << " entries" << std::endl;
+        std::cout << "Min log level: " << convertLevelToString(m_logLevel) << std::endl;
+        std::cout << "Console output: " << (m_isWriteToConsoleEnabled ? "Enabled" : "Disabled") << std::endl;
+        std::cout << "File output: " << (m_isWriteToFileEnabled ? "Enabled" : "Disabled") << std::endl;
+        if (m_isWriteToFileEnabled)
+        {
+            std::cout << "Log file: " << m_logFileName << std::endl;
+        }
+        std::cout << "=========================" << std::endl;
+    }
     /************************************
      * PRIVATE FUNCTIONS
      ************************************/
@@ -93,7 +168,7 @@ namespace App
         }
         else
         {
-            std::lock_guard<std::mutex> lock(logMutex);
+            std::lock_guard<std::mutex> lock(m_logMutex);
             std::string formattedMessage = formatMessage(level, message);
             m_buffer.push_back(formattedMessage);
             if(m_isWriteToConsoleEnabled)
@@ -115,4 +190,5 @@ namespace App
             }
         }
     }
+
 }

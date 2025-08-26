@@ -59,26 +59,73 @@ namespace App
              * @brief Destroys the Logger instance.
              */
             virtual ~Logger();
-            void debug(const std::string& message);
-            void info(const std::string& message);
-            void warning(const std::string& message);
-            void error(const std::string& message);
-            void critical(const std::string& message);
-            void setLogLevel(Levels logLevel);
-            Levels getLogLevel() const;
+            void debug(const std::string& message)
+            {
+                logMessage(Levels::DEBUG, message);
+            }
+            void info(const std::string& message)
+            {
+                logMessage(Levels::INFO, message);
+            }
+            void warning(const std::string& message)
+            {
+                logMessage(Levels::WARNING, message);
+            }
+            void error(const std::string& message)
+            {
+                logMessage(Levels::ERROR, message);
+            }
+            void critical(const std::string& message)
+            {
+                logMessage(Levels::CRITICAL, message);
+            }
+            inline void setLogLevel(Levels logLevel)
+            {
+                std::lock_guard<std::mutex> lock(m_logMutex);
+                m_logLevel = logLevel;
+            }
+            inline Levels getLogLevel() const
+            {
+                return m_logLevel;
+            }
+            inline void setWriteToConsole(bool enabled)
+            {
+                std::lock_guard<std::mutex> lock(m_logMutex);
+                m_isWriteToConsoleEnabled = enabled;
+            }
+            inline std::vector<std::string> getLogBuffer() const
+            {
+                std::lock_guard<std::mutex> lock(m_logMutex);
+                return m_buffer;
+            }
+            inline size_t getBufferSize(void) const
+            {
+                std::lock_guard<std::mutex> lock(m_logMutex);
+                return m_buffer.size();
+            }
+            inline void clearLogBuffer(void)
+            {
+                std::lock_guard<std::mutex> lock(m_logMutex);
+                m_buffer.clear();
+                std::cout << "Log buffer cleared." << std::endl;
+            }
+            inline void flushLogfile(void)
+            {
+                std::lock_guard<std::mutex> lock(m_logMutex);
+                if(m_logFileHandle.is_open())
+                {
+                    m_logFileHandle.flush();
+                }
+                
+            }
             void setWriteToFile(bool enabled, const std::string& fileName = "");
-            void setWriteToConsole(bool enabled);
-            std::vector<std::string> getLogBuffer() const;
-            size_t getBufferSize(void) const;
-            void clearLogBuffer(void);
-            void flushLogBuffer(void);
             void printBuffer(void);
             void dumpLogBufferToLogFile(const std::string& fileName = "");
-            void printStatistics(void) const;
+            void printStatistics(void);
         private:
             Levels m_logLevel;
             std::vector<std::string> m_buffer;
-            mutable std::mutex logMutex;
+            mutable std::mutex m_logMutex;
             std::string m_logFileName;
             std::ofstream m_logFileHandle;
             bool m_isWriteToFileEnabled;
