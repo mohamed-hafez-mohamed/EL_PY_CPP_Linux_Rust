@@ -30,7 +30,7 @@ namespace App
     /************************************
      * PUBLIC FUNCTIONS
      ************************************/
-    Logger::Logger(Levels logLevel, const std::string& logFileName, bool writeToConsole) : m_logLevel{logLevel}, m_isWriteToFileEnabled{logFileName.empty()}, m_isWriteToConsoleEnabled{writeToConsole}
+    Logger::Logger(Levels logLevel, const std::string& logFileName, bool writeToConsole) : m_logLevel{logLevel}, m_isWriteToFileEnabled{!logFileName.empty()}, m_isWriteToConsoleEnabled{writeToConsole}
     {
         if(m_isWriteToFileEnabled)
         {
@@ -49,7 +49,7 @@ namespace App
             m_logFileHandle.close();
         }
     }
-    void Logger::setWriteToFile(bool enabled, const std::string& fileName = "")
+    void Logger::setWriteToFile(bool enabled, const std::string& fileName)
     {
         std::lock_guard<std::mutex> lock(m_logMutex);
         if(enabled && (!fileName.empty()))
@@ -85,17 +85,17 @@ namespace App
         std::lock_guard<std::mutex> lock(m_logMutex);
         auto bufferIterator = m_buffer.begin();
         std::cout << "\n=== LOG BUFFER CONTENTS ===" << std::endl;
-        while(bufferIterator != m_buffer.end())
+        for (const auto& entry : m_buffer)
         {
-            std::cout << *bufferIterator << std::endl;
+            std::cout << entry << std::endl;
         }
         std::cout << "=== END LOG BUFFER ===" << std::endl;
     }
 
-    void Logger::dumpLogBufferToLogFile(const std::string& fileName = "")
+    void Logger::dumpLogBufferToLogFile(const std::string& fileName)
     {
         std::lock_guard<std::mutex> lock(m_logMutex);
-        std::ofstream fileHandle(fileName);
+        std::ofstream fileHandle(fileName, std::ios::app);
         if(fileHandle.is_open())
         {
             for(const auto& iterator : m_buffer)
@@ -105,6 +105,7 @@ namespace App
             fileHandle.close();
             std::cout << "Logs dumped to: " << fileName << std::endl;
         }
+        else
         {
             std::cerr << "Failed to open file for dumping: " << fileName << std::endl;
         }
@@ -190,5 +191,4 @@ namespace App
             }
         }
     }
-
 }

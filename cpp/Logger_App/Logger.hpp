@@ -7,6 +7,10 @@
  ********************************************************************************
  */
 
+#ifndef _LOGGER_HH_
+#define _LOGGER_HH_
+
+
 /************************************
  * INCLUDES
  ************************************/
@@ -15,7 +19,7 @@
 #include <vector>
 #include <fstream>
 #include <mutex>
-
+#include <memory>
 /************************************
  * NAMESPACES
  ************************************/
@@ -138,4 +142,36 @@ namespace App
             std::string formatMessage(Levels level, const std::string& message);
             void logMessage(Levels level, const std::string& message);
     };
+    // Singleton logger for global access
+    class GlobalLogger
+    {
+        public:
+            static Logger& getInstance()
+            {
+                std::lock_guard<std::mutex> lock(instanceMutex);
+                if (!instance)
+                {
+                    instance = std::make_unique<Logger>(Logger::Levels::DEBUG, "application.log", true);
+                }
+                return *instance;
+            }
+        
+            static void setInstance(std::unique_ptr<Logger> logger)
+            {
+                std::lock_guard<std::mutex> lock(instanceMutex);
+                instance = std::move(logger);
+            }
+        private:
+            static std::unique_ptr<Logger> instance;
+            static std::mutex instanceMutex;
+    };
 }
+
+// Convenience macros for global logger
+#define LOG_DEBUG(msg)    App::GlobalLogger::getInstance().debug(msg)
+#define LOG_INFO(msg)     App::GlobalLogger::getInstance().info(msg)
+#define LOG_WARNING(msg)  App::GlobalLogger::getInstance().warning(msg)
+#define LOG_ERROR(msg)    App::GlobalLogger::getInstance().error(msg)
+#define LOG_CRITICAL(msg) App::GlobalLogger::getInstance().critical(msg)
+
+#endif // _LOGGER_HH_
