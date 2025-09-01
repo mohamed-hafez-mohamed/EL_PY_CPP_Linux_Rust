@@ -63,56 +63,92 @@ namespace App
              * @brief Destroys the Logger instance.
              */
             virtual ~Logger();
+            /**
+             * @brief Log debug level.
+             */
             void debug(const std::string& message)
             {
                 logMessage(Levels::DEBUG, message);
             }
+            /**
+             * @brief Log info level.
+             */
             void info(const std::string& message)
             {
                 logMessage(Levels::INFO, message);
             }
+            /**
+             * @brief Log warning level.
+             */
             void warning(const std::string& message)
             {
                 logMessage(Levels::WARNING, message);
             }
+            /**
+             * @brief Log error level.
+             */
             void error(const std::string& message)
             {
                 logMessage(Levels::ERROR, message);
             }
+            /**
+             * @brief Log critical level.
+             */
             void critical(const std::string& message)
             {
                 logMessage(Levels::CRITICAL, message);
             }
+            /**
+             * @brief Set log level by user.
+             */
             inline void setLogLevel(Levels logLevel)
             {
                 std::lock_guard<std::mutex> lock(m_logMutex);
                 m_logLevel = logLevel;
             }
+            /**
+             * @brief Get log level.
+             */
             inline Levels getLogLevel() const
             {
                 return m_logLevel;
             }
+            /**
+             * @brief Set write to console parameter.
+             */
             inline void setWriteToConsole(bool enabled)
             {
                 std::lock_guard<std::mutex> lock(m_logMutex);
                 m_isWriteToConsoleEnabled = enabled;
             }
+            /**
+             * @brief Get log buffer.
+             */
             inline std::vector<std::string> getLogBuffer() const
             {
                 std::lock_guard<std::mutex> lock(m_logMutex);
                 return m_buffer;
             }
+            /**
+             * @brief Get log buffer size.
+             */
             inline size_t getBufferSize(void) const
             {
                 std::lock_guard<std::mutex> lock(m_logMutex);
                 return m_buffer.size();
             }
+            /**
+             * @brief Clear log buffer.
+             */
             inline void clearLogBuffer(void)
             {
                 std::lock_guard<std::mutex> lock(m_logMutex);
                 m_buffer.clear();
                 std::cout << "Log buffer cleared." << std::endl;
             }
+            /**
+             * @brief Flush log buffer.
+             */
             inline void flushLogfile(void)
             {
                 std::lock_guard<std::mutex> lock(m_logMutex);
@@ -122,9 +158,21 @@ namespace App
                 }
                 
             }
+            /**
+             * @brief Set write to file parameter.
+             */
             void setWriteToFile(bool enabled, const std::string& fileName = "");
+            /**
+             * @brief Print Log Buffer.
+             */
             void printBuffer(void);
+            /**
+             * @brief Dump log buffer into a file.
+             */
             void dumpLogBufferToLogFile(const std::string& fileName = "");
+            /**
+             * @brief Print some statistics.
+             */
             void printStatistics(void);
         private:
             Levels m_logLevel;
@@ -138,11 +186,22 @@ namespace App
              * @brief helper function to convert enum value to string
              */
             std::string convertLevelToString(Levels level);
+            /**
+             * @brief helper function to get time stamp
+             */
             std::string getCurrentTimestamp(void) const;
+            /**
+             * @brief helper function to format the log message
+             */
             std::string formatMessage(Levels level, const std::string& message);
+            /**
+             * @brief helper function to log the message into the buffer
+             */
             void logMessage(Levels level, const std::string& message);
     };
-    // Singleton logger for global access
+     /**
+      * @brief Singleton logger for global access
+      */
     class GlobalLogger
     {
         public:
